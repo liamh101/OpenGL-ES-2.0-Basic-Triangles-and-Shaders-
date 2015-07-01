@@ -3,6 +3,7 @@ package liamhackett.com.opengltest;
 import android.app.Activity;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -58,7 +59,26 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
+        // Set the background colour of the render
         GLES20.glClearColor(0.5f,0.5f,0.5f,0.5f);
+
+        //Set Camera behind the origin
+        final float eyeX = 0.0f;
+        final float eyeY = 0.0f;
+        final float eyeZ = 1.5f;
+
+        //Set up distance view
+        final float lookX = 0.0f;
+        final float lookY = 0.0f;
+        final float lookZ = 5.0f;
+
+        // Set our vector. This is where are head would be if we were holding the camera in real life.
+        final float upX = 0.0f;
+        final float upY = 1.0f;
+        final float upZ = 0.0f;
+
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+
 
 
     }
