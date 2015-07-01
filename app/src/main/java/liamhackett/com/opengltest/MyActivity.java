@@ -43,8 +43,17 @@ public class MyActivity extends Activity {
         }
 
         setContentView(mGLSurfaceView);
+    }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        mGLSurfaceView.onResume();
+    }
 
-
+    @Override
+    public void onPause(){
+        super.onPause();
+        mGLSurfaceView.onPause();
     }
 }
