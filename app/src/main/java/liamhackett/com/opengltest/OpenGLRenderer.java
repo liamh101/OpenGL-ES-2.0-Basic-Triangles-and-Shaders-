@@ -91,6 +91,14 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
                 + "     gl_Position = u_MVPMatrix * a_Position;     \n" //gl_Position will be used to store the final position.
                 + "}      \n"; //Multiply the vertex by the matrix to get the final point in normal screen position in normalized screen coordinates
+
+
+        final String fragmentShader =
+                "precision mediump float;   \n"// set the default position as medium. We don't need too much for a fragment shader
+                + "varying vec4 v_Color;    \n"// This is the colour from the vertex shader used to be spread across the whole triangle.
+                + "void main(){             \n"
+                + "     gl_FragColor = v_Color;\n"//Pull the colour directory through the pipeline.
+                + "}                        \n";
     }
 
     @Override
