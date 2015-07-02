@@ -60,7 +60,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
         // Set the background colour of the render
-        GLES20.glClearColor(0.5f,0.5f,0.5f,0.5f);
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
         //Set Camera behind the origin
         final float eyeX = 0.0f;
@@ -79,8 +79,18 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
+        final String vertexShader =
+                "uniform mat4 u_MVPMatrix;      \n" //A constant the represents the Model, View and Projection matrix
+                        + "attribute vec4 a_Position;   \n" //Pre-vertex position information we're going to pass in
+                        + "attribute vec4 a_Color;      \n" //Pre-vertex colour information we're going to pass in
 
+                        + "varying vec4 v_Color;        \n"//This will be passed into the fragment shader
 
+                + "void main(){     \n"
+                + "     v_Color = a_Color;      \n"//Pass the colour through to the fragment shader, this will be spread across the triangle
+
+                + "     gl_Position = u_MVPMatrix * a_Position;     \n" //gl_Position will be used to store the final position.
+                + "}      \n"; //Multiply the vertex by the matrix to get the final point in normal screen position in normalized screen coordinates
     }
 
     @Override
