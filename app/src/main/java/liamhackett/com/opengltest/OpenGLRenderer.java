@@ -107,12 +107,16 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
             //Pass in the shader source
             GLES20.glShaderSource(vertexShaderHandle, vertexShader);
 
+            //Compile shader code
             GLES20.glCompileShader(vertexShaderHandle);
+
 
             final int[] compiledStatus = new int[1];
 
+            //Check to see if shader has compiled properly
             GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compiledStatus, 0);
 
+            //Else remove references to shader
             if(compiledStatus[0] == 0){
                 GLES20.glDeleteShader(vertexShaderHandle);
                 vertexShaderHandle = 0;
@@ -121,6 +125,31 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
         if(vertexShaderHandle == 0)
             throw new RuntimeException("Error creating vertex shader");
+
+        int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
+
+        if(fragmentShaderHandle != 0 ){
+
+            //Pass in the Shader source
+            GLES20.glAttachShader(fragmentShaderHandle, vertexShaderHandle);
+
+            //Compile shader
+            GLES20.glCompileShader(fragmentShaderHandle);
+
+            final int[] compiledStatus = new int[1];
+
+            //Check to see if shader has compiled properly
+            GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compiledStatus, 0);
+
+            //Else remove references to shader
+            if(compiledStatus[0] == 0){
+                GLES20.glDeleteShader(fragmentShaderHandle);
+                fragmentShaderHandle = 0;
+            }
+        }
+
+        if(fragmentShaderHandle == 0)
+            throw new RuntimeException("Error creating fragment shader");
     }
 
     @Override
