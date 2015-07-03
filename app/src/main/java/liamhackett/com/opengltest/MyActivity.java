@@ -33,7 +33,7 @@ public class MyActivity extends Activity {
             mGLSurfaceView.setEGLContextClientVersion(2);
 
             //Set Renderer for App
-            //mGLSurfaceView.setRenderer();
+            mGLSurfaceView.setRenderer(new OpenGLRenderer());
 
 
         }

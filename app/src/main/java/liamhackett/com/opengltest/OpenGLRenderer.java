@@ -51,6 +51,12 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
     private float[] mViewMatrix;
 
+    private int mMVPMatrixHandle;
+
+    private int mPositionHandle;
+
+    private int mColourHandle;
+
     /**Store the view Matrix to use as are camera.
      *
      * @param gl
@@ -180,11 +186,36 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
         if(programHandle == 0)
             throw new RuntimeException("Error creating shader program.");
+
+
+        //Set Program handles
+        mMVPMatrixHandle = GLES20.glGetUniformLocation(programHandle, "u_MPVMatrix");
+        mPositionHandle = GLES20.glGetAttribLocation(programHandle, "a_Position");
+        mColourHandle = GLES20.glGetAttribLocation(programHandle, "a_Color");
+
+        GLES20.glUseProgram(programHandle);
+
     }
+
+    //Projection Matix is used to project 3D images onto a 2D view port
+    private float[] mProjectionMatrix = new float[16];
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
 
+        //Set the viewport to the same size of the phone screen
+        GLES20.glViewport(0, 0, width, height);
+
+        //Set new perceptive projection matix. The height will remain the same while the width will change based on aspect radio
+        final float ratio = (float) width / height;
+        final float left = -ratio;
+        final float right = ratio;
+        final float bottom = -1.0f;
+        final float top = 1.0f;
+        final float near = 1.0f;
+        final float far = 10.0f;
+
+        Matrix.frustumM(mProjectionMatrix, 0 , left, right, bottom, top, near, far);
     }
 
     @Override
