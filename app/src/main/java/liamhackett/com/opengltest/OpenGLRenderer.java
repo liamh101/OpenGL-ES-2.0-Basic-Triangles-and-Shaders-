@@ -150,6 +150,36 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
         if(fragmentShaderHandle == 0)
             throw new RuntimeException("Error creating fragment shader");
+
+
+        int programHandle = GLES20.glCreateProgram();
+
+        if(programHandle != 0){
+
+            //Bind vertex shader to program
+            GLES20.glAttachShader(programHandle, vertexShaderHandle);
+
+            //Bind fragment shader to program
+            GLES20.glAttachShader(programHandle, fragmentShaderHandle);
+
+            //Bind Attributes
+            GLES20.glBindAttribLocation(programHandle, 0, "a_Position");
+            GLES20.glBindAttribLocation(programHandle, 1, "a_Color");
+
+            //Link the two shaders together into the same program
+            GLES20.glLinkProgram(programHandle);
+
+            final int[] linkStatus = new int[1];
+            GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
+
+            if(linkStatus[0] == 0 ){
+                GLES20.glDeleteProgram(programHandle);
+                programHandle = 0;
+            }
+        }
+
+        if(programHandle == 0)
+            throw new RuntimeException("Error creating shader program.");
     }
 
     @Override
