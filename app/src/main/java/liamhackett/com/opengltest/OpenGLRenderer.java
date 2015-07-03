@@ -99,6 +99,28 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
                 + "void main(){             \n"
                 + "     gl_FragColor = v_Color;\n"//Pull the colour directory through the pipeline.
                 + "}                        \n";
+
+
+        int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
+
+        if(vertexShaderHandle != 0){
+            //Pass in the shader source
+            GLES20.glShaderSource(vertexShaderHandle, vertexShader);
+
+            GLES20.glCompileShader(vertexShaderHandle);
+
+            final int[] compiledStatus = new int[1];
+
+            GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compiledStatus, 0);
+
+            if(compiledStatus[0] == 0){
+                GLES20.glDeleteShader(vertexShaderHandle);
+                vertexShaderHandle = 0;
+            }
+        }
+
+        if(vertexShaderHandle == 0)
+            throw new RuntimeException("Error creating vertex shader");
     }
 
     @Override
