@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -19,13 +20,12 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
 
     //Store Triangles points that will be rendered on the screen.
     private final FloatBuffer mTriangle1Vertices;
-    private final FloatBuffer mTriangle2Vertices;
-    private final FloatBuffer mTriangle3Vertices;
+   // private final FloatBuffer mTriangle2Vertices;
+   // private final FloatBuffer mTriangle3Vertices;
 
-    private final int mBytesPerFloat;
+    private final int mBytesPerFloat = 4;
 
     public OpenGLRenderer(){
-        mBytesPerFloat = 4;
         mViewMatrix = new float[16];
 
         //Size and colour information for the buffer
@@ -137,7 +137,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
         if(fragmentShaderHandle != 0 ){
 
             //Pass in the Shader source
-            GLES20.glAttachShader(fragmentShaderHandle, vertexShaderHandle);
+            GLES20.glShaderSource(fragmentShaderHandle, fragmentShader);
 
             //Compile shader
             GLES20.glCompileShader(fragmentShaderHandle);
@@ -218,8 +218,64 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
         Matrix.frustumM(mProjectionMatrix, 0 , left, right, bottom, top, near, far);
     }
 
+    private float[] mModelMatrix = new float[16];
+
     @Override
     public void onDrawFrame(GL10 gl) {
 
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+
+        long time = SystemClock.uptimeMillis() % 10000L;
+        float angleInDegrees = (360.0f / 10000.0f) *((int)time);
+
+        Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
+        DrawTriangle(mTriangle1Vertices);
     }
+
+    private float[] mMVPMatrix = new float[16];
+
+    // How many elements per Vertex
+    private final int mStrideBytes = 7 * mBytesPerFloat;
+
+    // offset of the position data
+    private final int mPositionOffset = 0;
+
+    //offset of the position elements in data
+    private final int mPositionDataSize = 3;
+
+    // Offset of colour data
+    private final int mColourOffset = 3;
+
+    // Size of the colour data in elements
+    private final int mColourDataOffset = 4;
+
+    private void DrawTriangle(final FloatBuffer aTriangleBuffer){
+
+        // Pass in the position information
+        aTriangleBuffer.position(mPositionOffset);
+        GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false, mStrideBytes, aTriangleBuffer);
+
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
+
+        // Pass in colour infomation
+        aTriangleBuffer.position(mColourOffset);
+        GLES20.glVertexAttribPointer(mColourHandle, mColourDataOffset, GLES20.GL_FLOAT, false, mStrideBytes, aTriangleBuffer);
+
+        GLES20.glEnableVertexAttribArray(mColourHandle);
+
+        //Multiply the view matrix by the model matrix and store the result in a MVP matrix
+        Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
+
+        //Multiply the projection matrix by the viewmodel matrix and stores the result back into the MVP matrix
+        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
+
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+
+
+
+
+    }
+
 }
